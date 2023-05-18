@@ -29,16 +29,16 @@ public class UserController : ControllerBase
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
-        vault.GetSecret("dbconnection", "constring");
+        string cons = vault.GetSecret("dbconnection", "constring").Result;
         string constring = vault.secret;
-        Console.WriteLine(constring);
+        Console.WriteLine(cons);
         Console.WriteLine();
 
-//"mongodb://admin:1234@localhost:27018/?authsource=admin"
-         //
+        //"mongodb://admin:1234@localhost:27018/?authsource=admin"
+         
         _config = config;
         _logger = logger;
-        _client = new MongoClient(constring);
+        _client = new MongoClient(cons);
         _db = _client.GetDatabase("user");
     }
 

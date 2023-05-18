@@ -24,13 +24,13 @@ public class Vault
         httpClientHandler.ServerCertificateCustomValidationCallback =
         (message, cert, chain, sslPolicyErrors) => { return true; };
 
-        
 
-        
+
+
     }
 
-public async Task GetSecret(string path, string key)
-{
+    public async Task<string> GetSecret(string path, string key)
+    {
         // Initialize one of the several auth methods.
         IAuthMethodInfo authMethod = new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
         // Initialize settings. You can also set proxies, custom delegates etc.here.
@@ -46,16 +46,16 @@ public async Task GetSecret(string path, string key)
 
         IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
-    
-    
-    // Use client to read a key-value secret.
-Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: path, mountPoint: "secret");
 
-var secret = kv2Secret.Data.Data[key];
 
-Console.WriteLine($"MinHemmelighed: {secret}");
+        // Use client to read a key-value secret.
+        Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: path, mountPoint: "secret");
 
-this.secret = secret.ToString();
-}
+        var secret = kv2Secret.Data.Data[key];
+
+        Console.WriteLine($"MinHemmelighed: {secret}");
+
+        return secret.ToString(); 
+    }
 
 }
