@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Users.Models;
 using System.Security.Cryptography;
 using MongoDB.Driver;
-
+using Users;
 
 namespace Users.Controllers;
 
@@ -22,13 +22,17 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
-   
+    private Vault vault = new();
+    
     
 
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
+        var constring = vault.GetSecret("dbconnection", "constring").ToString();
+        Console.WriteLine(constring);
 
+         //
         _config = config;
         _logger = logger;
         _client = new MongoClient("mongodb://admin:1234@localhost:27018/?authsource=admin");
