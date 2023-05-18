@@ -12,6 +12,7 @@ public class Vault
     private HttpClientHandler httpClientHandler;
     private IVaultClient vaultClient;
     private IAuthMethodInfo authMethod;
+    public string secret;
 
 
 
@@ -23,9 +24,15 @@ public class Vault
         httpClientHandler.ServerCertificateCustomValidationCallback =
         (message, cert, chain, sslPolicyErrors) => { return true; };
 
+        
+
+        
+    }
+
+public async Task GetSecret(string path, string key)
+{
         // Initialize one of the several auth methods.
-        IAuthMethodInfo authMethod =
-        new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
+        IAuthMethodInfo authMethod = new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
         // Initialize settings. You can also set proxies, custom delegates etc.here.
         var vaultClientSettings = new VaultClientSettings(EndPoint, authMethod)
         {
@@ -36,22 +43,19 @@ public class Vault
                 BaseAddress = new Uri(EndPoint)
             }
         };
-        IVaultClient vaultClient = new VaultClient(vaultClientSettings);
-    }
 
-public async Task GetSecret(string path, string key)
-{
-    Console.WriteLine("Start");
-    Console.WriteLine(EndPoint);
-    Console.WriteLine(httpClientHandler);
+        IVaultClient vaultClient = new VaultClient(vaultClientSettings);
+
+    
     
     // Use client to read a key-value secret.
 Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: path, mountPoint: "secret");
-var minkode = kv2Secret.Data.Data[key];
 
-Console.WriteLine($"MinKode: {minkode}");
+var secret = kv2Secret.Data.Data[key];
 
+Console.WriteLine($"MinHemmelighed: {secret}");
 
+this.secret = secret.ToString();
 }
 
 }

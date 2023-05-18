@@ -29,15 +29,20 @@ public class UserController : ControllerBase
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
-        var constring = vault.GetSecret("dbconnection", "constring").ToString();
+        vault.GetSecret("dbconnection", "constring");
+        string constring = vault.secret;
         Console.WriteLine(constring);
+        Console.WriteLine();
 
+//"mongodb://admin:1234@localhost:27018/?authsource=admin"
          //
         _config = config;
         _logger = logger;
-        _client = new MongoClient("mongodb://admin:1234@localhost:27018/?authsource=admin");
+        _client = new MongoClient(constring);
         _db = _client.GetDatabase("user");
     }
+
+    
 
     const int keySize = 64;
     const int iterations = 350000;
@@ -56,6 +61,8 @@ public class UserController : ControllerBase
         return Convert.ToHexString(hash);
     }
 
+    
+
 
     // Initialize settings. You can also set proxies, custom delegates etc.here.
     
@@ -67,6 +74,8 @@ public class UserController : ControllerBase
         [HttpPost("createUser")]
     public async Task CreateUser(User u)
     {
+        
+
         _logger.LogInformation("Creating User");
 
         string hashedPassword = HashString(u.Password, out var passwordSalt);
