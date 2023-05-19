@@ -1,13 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-
-using System.Security.Claims;
-
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Users.Models;
-using System.Security.Cryptography;
 using MongoDB.Driver;
-using Users;
+
 
 namespace Users.Controllers;
 
@@ -31,7 +26,7 @@ public class UserController : ControllerBase
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
         string cons = vault.GetSecret("dbconnection", "constring").Result;
-        string constring = vault.secret;
+        
         Console.WriteLine(cons);
         Console.WriteLine();
 
@@ -61,7 +56,9 @@ public class UserController : ControllerBase
         _logger.LogInformation("Creating User");
 
         string hashedPassword = hashing.HashString(u.Password, out var passwordSalt);
+       
         string hashedCardN = hashing.HashString(u.CardN, out var cardSalt);
+        
         var collection = _db.GetCollection<User>("users");
         await collection.InsertOneAsync(
             new Models.User
@@ -74,7 +71,12 @@ public class UserController : ControllerBase
                 Cvr = u.Cvr,
                 Iban = u.Iban
             }
+             
                 );
+                await vault.StoreSalt("dbconnection", u.Email, passwordSalt);
+                await vault.StoreSalt("dbconnection", u.Email, cardSalt);
+                
+                
     }
 
 
