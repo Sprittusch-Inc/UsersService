@@ -23,6 +23,7 @@ public class UserController : ControllerBase
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
     private Vault vault = new();
+    private Hashing hashing = new();
     
     
 
@@ -44,25 +45,6 @@ public class UserController : ControllerBase
 
     
 
-    const int keySize = 64;
-    const int iterations = 350000;
-    HashAlgorithmName hashAlgorithm = HashAlgorithmName.SHA512;
-    string HashString(string s, out byte[] salt)
-    {
-        salt = RandomNumberGenerator.GetBytes(keySize);
-
-        var hash = Rfc2898DeriveBytes.Pbkdf2(
-            Encoding.UTF8.GetBytes(s),
-            salt,
-            iterations,
-            hashAlgorithm,
-            keySize);
-
-        return Convert.ToHexString(hash);
-    }
-
-    
-
 
     // Initialize settings. You can also set proxies, custom delegates etc.here.
     
@@ -78,8 +60,8 @@ public class UserController : ControllerBase
 
         _logger.LogInformation("Creating User");
 
-        string hashedPassword = HashString(u.Password, out var passwordSalt);
-        string hashedCardN = HashString(u.CardN, out var cardSalt);
+        string hashedPassword = hashing.HashString(u.Password, out var passwordSalt);
+        string hashedCardN = hashing.HashString(u.CardN, out var cardSalt);
         var collection = _db.GetCollection<User>("users");
         await collection.InsertOneAsync(
             new Models.User
@@ -103,7 +85,7 @@ public class UserController : ControllerBase
     {
         _logger.LogInformation("Creating User");
 
-        string hashedPassword = HashString(a.Password, out var passwordSalt);
+        string hashedPassword = hashing.HashString(a.Password, out var passwordSalt);
 
         var collection = _db.GetCollection<Admin>("admin");
         await collection.InsertOneAsync(
