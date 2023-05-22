@@ -105,15 +105,7 @@ public async Task DeleteUser(User u)
 
 public async Task<bool> IsUnique(User u)
 {
-    var result = await _collection.Find(x => x.Email == u.Email).SingleAsync();
-    if(result == null)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+   return false;
 
 }
 
