@@ -1,3 +1,5 @@
+using Users.Models;
+
 namespace Users.Test;
 
 public class Tests
@@ -5,6 +7,7 @@ public class Tests
     [SetUp]
     public void Setup()
     {
+        User u = new();
     }
 
     [Test]
