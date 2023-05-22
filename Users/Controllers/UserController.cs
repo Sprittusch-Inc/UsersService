@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Users.Models;
 using MongoDB.Driver;
+using Users.Services;
+
 
 
 namespace Users.Controllers;
@@ -17,6 +19,8 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
+    private readonly UserService _uService;
+    private readonly AdminService _aService;
     private Vault vault = new();
     private Hashing hashing = new();
     
@@ -36,6 +40,10 @@ public class UserController : ControllerBase
         _logger = logger;
         _client = new MongoClient(cons);
         _db = _client.GetDatabase("user");
+        var _uCollection = _db.GetCollection<User>("users");
+        var _aCollection = _db.GetCollection<Admin>("admin");
+        _uService = new UserService(_logger, _uCollection);
+        _aService = new AdminService(_logger, _aCollection);
     }
 
     
@@ -44,79 +52,40 @@ public class UserController : ControllerBase
     // Initialize settings. You can also set proxies, custom delegates etc.here.
     
 
-        /*
-        [HttpGet]
-        */
+        
         [AllowAnonymous]
         [HttpPost("createUser")]
     public async Task CreateUser(User u)
     {
         
-
-        _logger.LogInformation("Creating User");
-
-        string hashedPassword = hashing.HashString(u.Password, out var passwordSalt);
-       
-        string hashedCardN = hashing.HashString(u.CardN, out var cardSalt);
-        
-        var collection = _db.GetCollection<User>("users");
-        await collection.InsertOneAsync(
-            new Models.User
-            {
-                Email = u.Email,
-                UserName = u.UserName,
-                Password = hashedPassword,
-                CardN = hashedCardN,
-                IsBusiness = u.IsBusiness,
-                Cvr = u.Cvr,
-                Iban = u.Iban
-            }
-             
-                );
-                await vault.StoreSalt("dbconnection", u.Email, passwordSalt);
-                await vault.StoreSalt("dbconnection", u.Email, cardSalt);
+        await _uService.CreateUser(u);
                 
-                
+
     }
 
-
+    [AllowAnonymous]
+    [HttpPut("updateUser")]
+    public async Task UpdateUser(User u)
+    {
+        await _uService.UpdateUser(u);
+    }
 
     [Authorize]
     [HttpPost("createAdmin")]
     public async Task CreateAdmin(Admin a)
     {
-        _logger.LogInformation("Creating User");
-
-        string hashedPassword = hashing.HashString(a.Password, out var passwordSalt);
-
-        var collection = _db.GetCollection<Admin>("admin");
-        await collection.InsertOneAsync(
-            new Models.Admin
-            {
-                Email = a.Email,
-                UserName = a.UserName,
-                Password = hashedPassword,
-                AdminId = a.AdminId
-            }
-                );
+        await _aService.CreateAdmin(a);
     }
 
     [AllowAnonymous]
     [HttpPut("deleteUser")]
     public async Task DeleteUser(User u)
     {
-        _logger.LogInformation("Creating User");
-
-
-        var collection = _db.GetCollection<User>("users");
-        collection.DeleteOneAsync(x => x.Email == u.Email);
+        await _uService.DeleteUser(u);
 
     }
 
-    /*
-    [HttpDelete]
-    [HttpPut]
-    */
+    
 
 }
 
