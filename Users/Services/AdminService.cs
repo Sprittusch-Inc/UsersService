@@ -33,6 +33,7 @@ public class AdminService
                         Email = a.Email,
                         UserName = a.UserName,
                         Password = hashedPassword,
+                        Salt = passwordSalt,
                         AdminId = a.AdminId
                     }
                         );

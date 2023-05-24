@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Users.Models;
 using MongoDB.Driver;
 using Users.Services;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 
 namespace Users.Controllers;
@@ -70,15 +70,16 @@ public class UserController : ControllerBase
         await _uService.UpdateUser(u);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPost("createAdmin")]
     public async Task CreateAdmin(Admin a)
     {
         await _aService.CreateAdmin(a);
     }
 
-    [AllowAnonymous]
     [HttpPut("deleteUser")]
+    [Authorize(Roles = "Admin")]
+    
     public async Task DeleteUser(User u)
     {
         await _uService.DeleteUser(u);
