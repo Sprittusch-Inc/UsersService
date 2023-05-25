@@ -33,6 +33,7 @@ public class AdminService
                         Email = a.Email,
                         UserName = a.UserName,
                         Password = hashedPassword,
+                        Salt = passwordSalt,
                         AdminId = a.AdminId
                     }
                         );
@@ -52,9 +53,17 @@ public class AdminService
 
     public async Task DeleteAdmin(Admin a)
 {
-    _logger.LogInformation("Deleting Admin");
+    _logger.LogInformation($"Deleting Admin with email: {a.Email}");
     
+    try
+    {
     await _collection.DeleteOneAsync(x => x.Email == a.Email);
+    }
+    catch(Exception ex)
+    {
+        _logger.LogError(ex.Message);
+        throw;
+    }
 }
 
 }

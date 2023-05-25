@@ -13,6 +13,7 @@ public ObjectId Id{get; set;}
 public string? Email{get; set;}
 public string? UserName{get; set;}
 public string? Password{get; set;}
+public string? Role{get; set;} = "User";
 public Byte[]? CardSalt{get; set;}
 public Byte[]? PasswordSalt{get;set;}
 public string? CardN{get; set;}

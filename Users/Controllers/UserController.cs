@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Users.Models;
 using MongoDB.Driver;
 using Users.Services;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 
 
@@ -65,39 +65,49 @@ public class UserController : ControllerBase
         await _uService.CreateUser(u);
     }
 
-    //[Authorize]
+    [Authorize(Roles = "User")]
     [HttpGet("getUser")]
     public async Task GetUser(User u)
     {
         await _uService.GetUser(u);
     }
 
-    [Authorize]
+    [Authorize(Roles = "User")]
     [HttpPut("updateUser")]
     public async Task UpdateUser(User u)
     {
         await _uService.UpdateUser(u);
     }
 
-     [AllowAnonymous]
+    [Authorize(Roles = "User")]
     [HttpPut("deleteUser")]
     public async Task DeleteUser(User u)
     {
         await _uService.DeleteUser(u);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost("createAdmin")]
     public async Task CreateAdmin(Admin a)
     {
         await _aService.CreateAdmin(a);
     }
 
-     [Authorize]
+    
+    [Authorize(Roles = "Admin")]
     [HttpPut("deleteAdmin")]
+    
     public async Task DeleteAdmin(Admin a)
     {
-        await _aService.DeleteUser(a);
+        await -_aService.DeleteAdmin(a);
+    }
+
+    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [HttpPut("deleteUser")]
+    public async Task DeleteUser(User u)
+    {
+        await _uService.DeleteUser(u);
     }
 
    
