@@ -2,6 +2,7 @@ using VaultSharp;
 using VaultSharp.V1.AuthMethods.Token;
 using VaultSharp.V1.AuthMethods;
 using VaultSharp.V1.Commons;
+using Microsoft.Extensions.Configuration; 
 
 namespace Users;
 
@@ -12,14 +13,14 @@ public class Vault
     private HttpClientHandler httpClientHandler;
     //private IVaultClient vaultClient;
     //private IAuthMethodInfo authMethod;
-    
+    private readonly IConfiguration _config;
 
 
 
 
     public Vault()
     {
-        EndPoint = "https://localhost:8201/";
+        EndPoint = _config["Vault_Endpoint"];
         httpClientHandler = new HttpClientHandler();
         httpClientHandler.ServerCertificateCustomValidationCallback =
         (message, cert, chain, sslPolicyErrors) => { return true; };
@@ -32,7 +33,7 @@ public class Vault
     public async Task<string> GetSecret(string path, string key)
     {
         // Initialize one of the several auth methods.
-        IAuthMethodInfo authMethod = new TokenAuthMethodInfo("00000000-0000-0000-0000-000000000000");
+        IAuthMethodInfo authMethod = new TokenAuthMethodInfo(_config["Vault_Token"]);
         // Initialize settings. You can also set proxies, custom delegates etc.here.
         var vaultClientSettings = new VaultClientSettings(EndPoint, authMethod)
         {

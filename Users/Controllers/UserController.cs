@@ -99,16 +99,10 @@ public class UserController : ControllerBase
     
     public async Task DeleteAdmin(Admin a)
     {
-        await -_aService.DeleteAdmin(a);
+        await _aService.DeleteAdmin(a);
     }
 
-    [Authorize]
-    [Authorize(Roles = "Admin")]
-    [HttpPut("deleteUser")]
-    public async Task DeleteUser(User u)
-    {
-        await _uService.DeleteUser(u);
-    }
+    
 
    
 
