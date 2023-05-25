@@ -1,5 +1,6 @@
 using Users.Models;
 using MongoDB.Driver;
+using System;
 
 namespace Users.Services;
 
@@ -16,12 +17,12 @@ public UserService(ILogger logger, IMongoCollection<User> collection)
 _collection = collection;
 _logger = logger;
 }
-public async Task CreateUser(User u)
+public async Task<IResult> CreateUser(User u)
 {
 
         _logger.LogInformation("Creating User");
      
-       try{
+      // try{
         //Sikrer at nødvendige felter er udfyldt, ellers smides der en exception
         if(u.Email != null && u.UserName != null && u.Password != null)
         {
@@ -38,20 +39,23 @@ public async Task CreateUser(User u)
                 IsBusiness = u.IsBusiness,
                 Cvr = u.Cvr
             }
+            
         );
-        
+        return Results.Ok();
         }
 
         else
         {
+            //_logger.LogError("parameter 0 detected");
+            Console.WriteLine("fejl!");
             throw new Exception("A user must contain a unique email, unique username and password");
         }
-       }
+       /*}
        catch(Exception ex)
        {
         _logger.LogError(ex.Message);
-        throw;
-       }   
+        return Results.BadRequest();
+       } */  
 
        
 
@@ -88,6 +92,8 @@ public async Task UpdateUser(User u)
         
         await _collection.UpdateOneAsync(filter, update);
         await _collection.UpdateOneAsync (filter, updateSalt);
+
+        //return Ok();
     }
     
     //Hvis der hverken er et iban nummer eller et kort nummer bliver der kastet en exception
@@ -100,7 +106,7 @@ public async Task UpdateUser(User u)
     catch(Exception ex)
     {
         _logger.LogError(ex.Message);
-        throw;
+        return Results.BadRequest;
     }    
 }
 
@@ -110,6 +116,7 @@ public async Task DeleteUser(User u)
     try
     {
     await _collection.DeleteOneAsync(x => x.Email == u.Email);
+    //return Ok();
     }
 
     catch(Exception ex)
