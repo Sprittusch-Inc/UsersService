@@ -6,6 +6,7 @@ using Users.Services;
 
 
 
+
 namespace Users.Controllers;
 
 [ApiController]
@@ -19,28 +20,37 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
-    private readonly UserService _uService;
+    private  UserService _uService;
     private readonly AdminService _aService;
     private Vault vault = new();
     private Hashing hashing = new();
-    
-    
+
+
 
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
+        //Henter connectionstring fra vault
         string cons = vault.GetSecret("dbconnection", "constring").Result;
-        
+
         Console.WriteLine(cons);
         Console.WriteLine();
 
         //"mongodb://admin:1234@localhost:27018/?authsource=admin"
-         
+
         _config = config;
         _logger = logger;
+
+        //starter en client med den hentede connectionstring
         _client = new MongoClient(cons);
+
+        //Henter user databasen fra mongodb
         _db = _client.GetDatabase("user");
+
+        //Henter kollektion users
         var _uCollection = _db.GetCollection<User>("users");
+
+        //Henter kollektion 
         var _aCollection = _db.GetCollection<Admin>("admin");
         _uService = new UserService(_logger, _uCollection);
         _aService = new AdminService(_logger, _aCollection);
@@ -48,26 +58,32 @@ public class UserController : ControllerBase
 
     
 
-
-    // Initialize settings. You can also set proxies, custom delegates etc.here.
-    
-
-        
-        [AllowAnonymous]
-        [HttpPost("createUser")]
+    [AllowAnonymous]
+    [HttpPost("createUser")]
     public async Task CreateUser(User u)
     {
-        
         await _uService.CreateUser(u);
-                
-
     }
 
-    [AllowAnonymous]
+    //[Authorize]
+    [HttpGet("getUser")]
+    public async Task GetUser(User u)
+    {
+        await _uService.GetUser(u);
+    }
+
+    [Authorize]
     [HttpPut("updateUser")]
     public async Task UpdateUser(User u)
     {
         await _uService.UpdateUser(u);
+    }
+
+     [AllowAnonymous]
+    [HttpPut("deleteUser")]
+    public async Task DeleteUser(User u)
+    {
+        await _uService.DeleteUser(u);
     }
 
     [Authorize]
@@ -77,15 +93,16 @@ public class UserController : ControllerBase
         await _aService.CreateAdmin(a);
     }
 
-    [AllowAnonymous]
-    [HttpPut("deleteUser")]
-    public async Task DeleteUser(User u)
+     [Authorize]
+    [HttpPut("deleteAdmin")]
+    public async Task DeleteAdmin(Admin a)
     {
-        await _uService.DeleteUser(u);
-
+        await _aService.DeleteUser(a);
     }
 
-    
+   
+
+
 
 }
 

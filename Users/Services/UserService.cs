@@ -3,8 +3,10 @@ using MongoDB.Driver;
 
 namespace Users.Services;
 
-public class UserService
+
+public class UserService 
 {
+    //
 private readonly ILogger _logger;
 private readonly IMongoCollection<User> _collection;
 private Hashing hashing = new();
@@ -18,14 +20,14 @@ public async Task CreateUser(User u)
 {
 
         _logger.LogInformation("Creating User");
-
      
        try{
-
+        //Sikrer at nødvendige felter er udfyldt, ellers smides der en exception
         if(u.Email != null && u.UserName != null && u.Password != null)
         {
-        string hashedPassword = hashing.HashString(u.Password, out var passwordSalt);    
-        //var collection = _db.GetCollection<User>("users");
+        //Hasher password og smider salt    
+        string hashedPassword = hashing.HashString(u.Password, out var passwordSalt);   
+        // Indsætter i databasen
         await _collection.InsertOneAsync(
             new Models.User
             {
@@ -36,22 +38,22 @@ public async Task CreateUser(User u)
                 IsBusiness = u.IsBusiness,
                 Cvr = u.Cvr
             }
-        
-        
         );
         
         }
 
         else
         {
-            throw new Exception("A user must contain a unique email, username and password");
+            throw new Exception("A user must contain a unique email, unique username and password");
         }
        }
        catch(Exception ex)
        {
         _logger.LogError(ex.Message);
-        
+        throw;
        }   
+
+       
 
 } 
 
@@ -61,10 +63,12 @@ public async Task UpdateUser(User u)
 
     try {
 
+    //Ser om et iban nummer er blevet tastet ind
     if(u.Iban != null)
     {
+    //Hasher iban nummer og smider salt    
     string hashedIban = hashing.HashString(u.Iban, out var ibanSalt);
-    
+        //Finder en user ud fra filter, laver derefter 2 opdateringer
         var filter = Builders<User>.Filter.Eq("Email", u.Email);
         var update = Builders<User>.Update.Set("Iban", hashedIban); 
         var updateSalt = Builders<User>.Update.Set("IbanSalt", ibanSalt);
@@ -72,10 +76,12 @@ public async Task UpdateUser(User u)
         await _collection.UpdateOneAsync(filter, update);
         await _collection.UpdateOneAsync (filter, updateSalt);
     }
-
+    //Ser om et kort nummer er blevet tastet ind
     if(u.CardN != null)
     {
+        //Hasher kort nummer og smider salt
         string hashedCard = hashing.HashString(u.CardN, out var cardSalt);
+        //Finder en user ud fra filter, laver derefter 2 opdateringer
         var filter = Builders<User>.Filter.Eq("Email", u.Email);
         var update = Builders<User>.Update.Set("CardN", hashedCard); 
         var updateSalt = Builders<User>.Update.Set("CardSalt", cardSalt);
@@ -83,7 +89,8 @@ public async Task UpdateUser(User u)
         await _collection.UpdateOneAsync(filter, update);
         await _collection.UpdateOneAsync (filter, updateSalt);
     }
-
+    
+    //Hvis der hverken er et iban nummer eller et kort nummer bliver der kastet en exception
     else
     {
         throw new Exception("Please enter either a valid Iban number, or card number");
@@ -93,21 +100,48 @@ public async Task UpdateUser(User u)
     catch(Exception ex)
     {
         _logger.LogError(ex.Message);
+        throw;
     }    
 }
 
 public async Task DeleteUser(User u)
 {
-    _logger.LogInformation("Deleting User");
-    
+    _logger.LogInformation($"Deleting User with email: {u.Email}");
+    try
+    {
     await _collection.DeleteOneAsync(x => x.Email == u.Email);
+    }
+
+    catch(Exception ex)
+    {
+        _logger.LogError(ex.Message);
+        throw;
+    }
 }
 
-public async Task<bool> IsUnique(User u)
+public async Task<User> GetUser(User u)
 {
-   return false;
+    _logger.LogInformation($"Retrieving user with email: {u.Email}");
 
+    try
+    {
+    //Finder en user hvis email matcher med argumentet User u    
+    var filter = Builders<User>.Filter.Eq("Email", u.Email);
+    //Henter resultat ud af databasen ved hjælp af filteret
+    var result = await _collection.Find(filter).SingleAsync();
+    return result;
+    }
+
+    catch(Exception ex)
+    {
+        _logger.LogError(ex.Message);
+        throw;
+    }
+    
+ 
+    
 }
+
 
                 
 }
