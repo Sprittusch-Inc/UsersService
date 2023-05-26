@@ -24,10 +24,10 @@ public class AdminService
 
             if (a.Email != null && a.UserName != null && a.Password != null)
             {
-
+                _logger.LogInformation("Processing password...");
                 string hashedPassword = hashing.HashString(a.Password, out var passwordSalt);
 
-
+                _logger.LogInformation("Attempting to insert admin in database...");
                 await _collection.InsertOneAsync(
                     new Models.Admin
                     {
@@ -38,6 +38,7 @@ public class AdminService
                         AdminId = a.AdminId
                     }
                         );
+                    _logger.LogInformation($"Successfully inserted admin with the email {a.Email} in the database");
             }
             else
             {
@@ -62,7 +63,9 @@ public class AdminService
     
     try
     {
-    await _collection.DeleteOneAsync(x => x.Email == a.Email);
+            _logger.LogInformation("Attempting to delete admin in database...");
+            await _collection.DeleteOneAsync(x => x.Email == a.Email);
+            _logger.LogInformation($"Successfully deleted admin with the email: {a.Email}");
     }
     catch(Exception ex)
     {
