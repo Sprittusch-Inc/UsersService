@@ -20,9 +20,9 @@ public class UserController : ControllerBase
     private readonly ILogger<UserController> _logger;
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
-    private  UserService _uService;
+    private readonly UserService _uService;
     private readonly AdminService _aService;
-    private Vault vault = new();
+    
     private Hashing hashing = new();
 
 
@@ -30,6 +30,7 @@ public class UserController : ControllerBase
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
+        Vault vault = new Vault(config);
         //Henter connectionstring fra vault
         string cons = vault.GetSecret("dbconnection", "constring").Result;
 
@@ -54,6 +55,7 @@ public class UserController : ControllerBase
         var _aCollection = _db.GetCollection<Admin>("admin");
         _uService = new UserService(_logger, _uCollection);
         _aService = new AdminService(_logger, _aCollection);
+        
     }
 
     

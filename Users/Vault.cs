@@ -18,13 +18,17 @@ public class Vault
 
 
 
-    public Vault()
-    {
-        EndPoint = _config["Vault_Endpoint"];
-        httpClientHandler = new HttpClientHandler();
-        httpClientHandler.ServerCertificateCustomValidationCallback =
-        (message, cert, chain, sslPolicyErrors) => { return true; };
-
+    public Vault(IConfiguration config)
+    { 
+       _config = config;
+       EndPoint = _config["Vault_Endpoint"];
+       httpClientHandler = new HttpClientHandler();
+       httpClientHandler.ServerCertificateCustomValidationCallback = 
+       (message, cert, chain, sslPolicyErrors)=>{ return true; };
+        
+        
+        
+        
 
 
 

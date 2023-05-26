@@ -4,8 +4,12 @@ using Microsoft.IdentityModel.Tokens;
 using Users;
 
 var builder = WebApplication.CreateBuilder(args);
+IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+configurationBuilder.AddJsonFile("appsettings.json");
+configurationBuilder.AddEnvironmentVariables();
+IConfiguration config = configurationBuilder.Build();
 
-Vault vault = new();
+Vault vault = new Vault(config);
 string mySecret = vault.GetSecret("authentication", "secret").Result;
 string myIssuer = vault.GetSecret("authentication", "issuer").Result;
 builder.Services
@@ -15,11 +19,9 @@ builder.Services
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
-
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = myIssuer,
-        
         IssuerSigningKey =
     new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mySecret))
     };

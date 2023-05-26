@@ -1,5 +1,6 @@
 using Users.Models;
 using MongoDB.Driver;
+using System;
 
 namespace Users.Services;
 
@@ -14,7 +15,7 @@ public class AdminService
         _collection = collection;
         _logger = logger;
     }
-    public async Task CreateAdmin(Admin a)
+    public async Task<IResult> CreateAdmin(Admin a)
     {
         _logger.LogInformation("Creating Admin");
 
@@ -42,11 +43,15 @@ public class AdminService
             {
                 throw new Exception("A user must contain a unique email, username and password");
             }
+
+            return Results.Ok();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-        }
+        catch(Exception ex)
+       {
+        throw ex;
+        _logger.LogError(ex.Message);
+        return Results.BadRequest();
+       } 
 
 
     }
