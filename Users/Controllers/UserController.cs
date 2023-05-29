@@ -88,7 +88,7 @@ public class UserController : ControllerBase
         await _uService.DeleteUser(u);
     }
 
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
     [HttpPost("createAdmin")]
     public async Task CreateAdmin(Admin a)
     {

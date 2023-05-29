@@ -144,6 +144,7 @@ public class UserService
             var filter = Builders<User>.Filter.Eq("Email", u.Email);
             //Henter resultat ud af databasen ved hjælp af filteret
             var result = await _collection.Find(filter).SingleAsync();
+            _logger.LogInformation($"User with email: {result.Email} was found");
             return result;
         }
 

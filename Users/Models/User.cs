@@ -19,7 +19,7 @@ public Byte[]? PasswordSalt{get;set;}
 public string? CardN{get; set;}
 public bool IsBusiness{get; set;}
 public string? Iban{get; set;}
-public string? IbanSalt{get; set;}
+public byte[]? IbanSalt{get; set;}
 public string? Cvr{get; set;}
 
 
