@@ -12,14 +12,22 @@ NLog.LogManager.Setup()
 logger.Debug("init main");
 
 var builder = WebApplication.CreateBuilder(args);
+// Vault deployment-issues
+/*
 IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 configurationBuilder.AddJsonFile("appsettings.json");
 configurationBuilder.AddEnvironmentVariables();
 IConfiguration config = configurationBuilder.Build();
 
 Vault vault = new Vault(config);
+
 string mySecret = vault.GetSecret("authentication", "secret").Result;
 string myIssuer = vault.GetSecret("authentication", "issuer").Result;
+*/
+
+string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "Sprittusch Inc.";
+string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "SpritNet";
+
 builder.Services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
@@ -27,7 +35,7 @@ builder.Services
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = myIssuer,

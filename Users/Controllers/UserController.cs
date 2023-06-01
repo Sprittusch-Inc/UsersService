@@ -22,7 +22,7 @@ public class UserController : ControllerBase
     protected static IMongoDatabase _db;
     private readonly UserService _uService;
     private readonly AdminService _aService;
-    
+    private static string? _connString;
     private Hashing hashing = new();
 
 
@@ -30,20 +30,18 @@ public class UserController : ControllerBase
 
     public UserController(ILogger<UserController> logger, IConfiguration config)
     {
+        /*
         Vault vault = new Vault(config);
-        //Henter connectionstring fra vault
+        // Henter connectionstring fra vault
         string cons = vault.GetSecret("dbconnection", "constring").Result;
-
-        Console.WriteLine(cons);
-        Console.WriteLine();
-
-        //"mongodb://admin:1234@localhost:27018/?authsource=admin"
+        */
 
         _config = config;
         _logger = logger;
+        _connString = config["MongoConnection"];
 
         //starter en client med den hentede connectionstring
-        _client = new MongoClient(cons);
+        _client = new MongoClient(_connString);
 
         //Henter user databasen fra mongodb
         _db = _client.GetDatabase("user");
