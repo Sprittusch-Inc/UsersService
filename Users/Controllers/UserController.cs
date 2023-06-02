@@ -11,8 +11,6 @@ namespace Users.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
-
 public class UserController : ControllerBase
 {
 
@@ -21,7 +19,6 @@ public class UserController : ControllerBase
     protected static IMongoClient _client;
     protected static IMongoDatabase _db;
     private readonly UserService _uService;
-    private readonly AdminService _aService;
     private static string? _connString;
     private Hashing hashing = new();
 
@@ -50,37 +47,41 @@ public class UserController : ControllerBase
         var _uCollection = _db.GetCollection<User>("users");
 
         //Henter kollektion 
-        var _aCollection = _db.GetCollection<Admin>("admin");
+        
         _uService = new UserService(_logger, _uCollection);
-        _aService = new AdminService(_logger, _aCollection);
+        
         
     }
 
     
 
-    [AllowAnonymous]
+   
     [HttpPost("user")]
+    [AllowAnonymous]
     public async Task CreateUser(User u)
     {
         await _uService.CreateUser(u);
     }
 
-    [Authorize(Roles = "User")]
+    
     [HttpGet("user")]
+    [Authorize(Roles = "User")]
     public async Task GetUser(User u)
     {
         await _uService.GetUser(u);
     }
 
-    [Authorize(Roles = "User")]
+    
     [HttpPut("user")]
+    [Authorize(Roles = "User")]
     public async Task UpdateUser(User u)
     {
         await _uService.UpdateUser(u);
     }
 
+    
+    [HttpDelete("user")]
     [Authorize(Roles = "User")]
-    [HttpPut("user")]
     public async Task DeleteUser(User u)
     {
         await _uService.DeleteUser(u);

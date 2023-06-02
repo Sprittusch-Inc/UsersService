@@ -52,17 +52,18 @@ public class AdminController : ControllerBase
         
     }
 
-    [AllowAnonymous]
+   
     [HttpPost("admin")]
+    [AllowAnonymous]
     public async Task CreateAdmin(Admin a)
     {
         await _aService.CreateAdmin(a);
     }
 
     
+   
+    [HttpDelete("Admin")]
     [Authorize(Roles = "Admin")]
-    [HttpPut("Admin")]
-    
     public async Task DeleteAdmin(Admin a)
     {
         await _aService.DeleteAdmin(a);

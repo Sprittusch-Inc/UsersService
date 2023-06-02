@@ -25,8 +25,8 @@ string mySecret = vault.GetSecret("authentication", "secret").Result;
 string myIssuer = vault.GetSecret("authentication", "issuer").Result;
 */
 
-string myIssuer = Environment.GetEnvironmentVariable("Issuer") ?? "Sprittusch Inc.";
-string mySecret = Environment.GetEnvironmentVariable("Secret") ?? "SpritNet";
+string myIssuer = Environment.GetEnvironmentVariable("Issuer");
+string mySecret = Environment.GetEnvironmentVariable("Secret");
 
 builder.Services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
