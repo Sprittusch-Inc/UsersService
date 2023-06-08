@@ -47,7 +47,6 @@ public class UserController : ControllerBase
         var _uCollection = _db.GetCollection<User>("users");
 
         //Henter kollektion 
-        
         _uService = new UserService(_logger, _uCollection);
         
         

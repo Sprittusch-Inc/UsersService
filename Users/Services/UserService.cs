@@ -87,6 +87,7 @@ public class UserService
 
                 await _collection.UpdateOneAsync(filter, update);
                 await _collection.UpdateOneAsync(filter, updateSalt);
+                  _logger.LogInformation($"User with email: {u.Email} has been updated with a iban number");
             }
             //Ser om et kort nummer er blevet tastet ind
             if (u.CardN != null)
@@ -97,11 +98,10 @@ public class UserService
                 var filter = Builders<User>.Filter.Eq("Email", u.Email);
                 var update = Builders<User>.Update.Set("CardN", hashedCard);
                 var updateSalt = Builders<User>.Update.Set("CardSalt", cardSalt);
-
+                 
                 await _collection.UpdateOneAsync(filter, update);
                 await _collection.UpdateOneAsync(filter, updateSalt);
-
-                
+                _logger.LogInformation($"User with email: {u.Email} has been updated with a card number");
             }
 
             //Hvis der hverken er et iban nummer eller et kort nummer bliver der kastet en exception
@@ -124,7 +124,7 @@ public class UserService
         try
         {
             await _collection.DeleteOneAsync(x => x.Email == u.Email);
-            return Results.Ok();
+            return Results.Ok($"User with email: {u.Email} was deleted");
         }
 
         catch (Exception ex)
