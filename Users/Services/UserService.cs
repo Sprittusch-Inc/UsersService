@@ -87,7 +87,7 @@ public class UserService
 
                 await _collection.UpdateOneAsync(filter, update);
                 await _collection.UpdateOneAsync(filter, updateSalt);
-                  _logger.LogInformation($"User with email: {u.Email} has been updated with a iban number");
+                  _logger.LogInformation($"User with email: {u.Email} has been updated with an iban number");
             }
             //Ser om et kort nummer er blevet tastet ind
             if (u.CardN != null)
