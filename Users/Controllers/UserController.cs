@@ -65,7 +65,8 @@ public class UserController : ControllerBase
 
     
     [HttpGet("user")]
-    [Authorize(Roles = "User")]
+    [AllowAnonymous]
+    // [Authorize(Roles = "User")]
     public async Task GetUser(User u)
     {
         await _uService.GetUser(u);
@@ -73,7 +74,8 @@ public class UserController : ControllerBase
 
     
     [HttpPut("user")]
-    [Authorize(Roles = "User")]
+    [AllowAnonymous]
+    // [Authorize(Roles = "User")]
     public async Task UpdateUser(User u)
     {
         await _uService.UpdateUser(u);
@@ -81,7 +83,8 @@ public class UserController : ControllerBase
 
     
     [HttpDelete("user")]
-    [Authorize(Roles = "User")]
+    [AllowAnonymous]
+    // [Authorize(Roles = "User")]
     public async Task DeleteUser(User u)
     {
         await _uService.DeleteUser(u);

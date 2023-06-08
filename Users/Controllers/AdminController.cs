@@ -63,7 +63,8 @@ public class AdminController : ControllerBase
     
    
     [HttpDelete("Admin")]
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
+    // [Authorize(Roles = "Admin")]
     public async Task DeleteAdmin(Admin a)
     {
         await _aService.DeleteAdmin(a);
